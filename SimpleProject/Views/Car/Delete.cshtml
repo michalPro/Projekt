@@ -1,0 +1,41 @@
+﻿@model  SimpleProject.Contract.DataContracts.CarDto
+
+@{
+    ViewBag.Title = "AddEdit";
+}
+
+@using (Ajax.BeginForm("DeleteConfirm", "Car", null, new AjaxOptions
+{
+    HttpMethod = "POST",
+    OnSuccess = "onSuccess(data);"
+}, new { @class = "form-horizontal", id = "carForm" }))
+{
+<!-- Hidden -->
+
+@Html.HiddenFor(m => m.Id)
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <h4 class="modal-title">@ViewBag.Action</h4>
+</div>
+<div class="modal-body">
+    <p>Czy na pewno chcesz usunąć ten obiekt? (@Model.Id)</p>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-success">Usuń</button>
+</div>
+}
+
+<script>
+    function onSuccess(result) {
+        if (result.IsSuccess == true) {
+            $('#carModal').modal('hide');
+            reloadTable();
+        }
+        else
+            alert(result.ErrorMessage);
+    }
+</script>
+
+
+

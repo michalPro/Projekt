@@ -1,0 +1,158 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<div style="margin-bottom: 20px">
+    <button id="openAddModal" type="button" class="btn btn-default btn-sm">Add</button>
+    <button id="openEditModal" type="button" class="btn btn-default btn-sm">Edit</button>
+    <button id="openDeleteModal" type="button" class="btn btn-default btn-sm">Delete</button>
+</div>
+
+<table id="carsTable"  class="display" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Year</th>
+            <th>Color</th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Year</th>
+            <th>Color</th>
+        </tr>
+    </tfoot>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="carModal" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <!-- Generated -->
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+
+        var reloadTable = function () {
+            var table = $('#carsTable').DataTable().clear();
+
+            $.ajax({
+                type: "Get",
+                url: '@Url.Action("List", "Car")',
+                contentType: "application/json",
+                dataType: "json",
+                success: function (result) {
+                    if (result.IsSuccess == true)
+                        table.rows.add(result.Item).draw();
+                    else
+                        alert(result.ErrorMessage);
+                },
+                error: function (result) {
+                    alert("error");
+                },
+            });
+        }
+
+        var initializaDataTable = function (result) {
+            var table = $('#carsTable').DataTable({
+                data: result.Item,
+                columns: [
+                    { "data": "Id" },
+                    { "data": "Name" },
+                    { "data": "Year" },
+                    { "data": "Color" },
+                ],
+            });
+
+            $('#carsTable tbody').on('click', 'tr', function () {
+                if ($(this).hasClass('selected')) {
+                    $(this).removeClass('selected');
+                }
+                else {
+                    table.$('tr.selected').removeClass('selected');
+                    $(this).addClass('selected');
+                }
+            });
+
+            var openEditModalBTN = $("#openEditModal");
+            
+            openEditModalBTN.on("click", function () {
+                var url = "@Url.Action("AddEdit")";
+                var data = table.row('.selected').data()
+                if (data !== undefined) {
+                    var id = data.Id;
+                    url += "?Id=" + id;
+                    getContent(url);
+                }
+                else {
+                    alert("Brak zaznaczenia");
+                }  
+            });
+
+            var openDeleteModalBTN = $("#openDeleteModal");
+
+            openDeleteModalBTN.on("click", function () {
+                var url = "@Url.Action("Delete")";
+
+                var data = table.row('.selected').data()
+                if (data !== undefined) {
+                    var id = data.Id;
+                    url += "?Id=" + id;
+                    getContent(url);
+                }
+                else {
+                    alert("Brak zaznaczenia");
+                }             
+            });
+        }
+
+        var readDataSourceAndInitializaDataTable = function () {
+            $.ajax({
+                type: "Get",
+                url: '@Url.Action("List", "Car")',
+                contentType: "application/json",
+                dataType: "json",
+                success: function (result) {
+                    if (result.IsSuccess == true) 
+                        initializaDataTable(result);             
+                    else
+                        alert(result.ErrorMessage);
+                },
+                error: function (result) {
+                    alert("error");
+                },
+            });
+        }
+
+        var getContent = function (url) {
+            $.get(url, function (data) {
+                $("#carModal").find(".modal-content").html(data.body);
+                $('#carModal').modal('show');
+            });
+        }
+
+        var registerEvents = function () {
+            var openAddModalBTN = $("#openAddModal");
+
+            openAddModalBTN.on("click", function () {
+                getContent("@Url.Action("AddEdit")");
+            });
+        }
+
+        $(document).ready(function () {
+            readDataSourceAndInitializaDataTable();
+            registerEvents();
+        });
+    </script>
+}
+

@@ -29,3 +29,49 @@
         <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
     </div>
 </div>
+
+<button id="openHomeModal1" type="button" class="btn btn-info btn-lg">Open Modal 1</button>
+<button id="openHomeModal2" type="button" class="btn btn-info btn-lg">Open Modal 2</button>
+
+
+<!-- Modal -->
+<div class="modal fade" id="homeModal" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <!-- Generated -->
+        </div>
+    </div>
+</div>
+
+@section scripts {
+<script>
+
+    var registerEvents = function () {
+        var openHomeModalBTN1 = $("#openHomeModal1");
+        var openHomeModalBTN2 = $("#openHomeModal2");
+
+        openHomeModalBTN1.on("click", function () {
+            $.get("@Url.Action("Test1", new { id = 1})", function (data) {
+                $("#homeModal").find(".modal-content").html(data.body);
+            });
+
+            $('#homeModal').modal('show');
+        });
+
+        openHomeModalBTN2.on("click", function () {
+            $.get("@Url.Action("Test2", new { id = 2})", function (data) {
+                $("#homeModal").find(".modal-content").html(data.body);
+            });
+
+            $('#homeModal').modal('show');
+        });
+    }
+
+    $(function () {
+        registerEvents();
+    });
+
+</script>
+}
+
